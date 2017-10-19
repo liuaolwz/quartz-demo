@@ -1,0 +1,10 @@
+server:
+  port: 9092
+spring:
+  jpa:
+    database: mysql
+  datasource:
+    url: jdbc:mysql://localhost:3306/quartz?characterEncoding=UTF-8&autoReconnect=true&rewriteBatchedStatements=true&allowMultiQueries=true&useSSL=true
+    username: ticket
+    password: ticket
+    driver-class-name: com.mysql.jdbc.Driver
