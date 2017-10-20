@@ -15,7 +15,7 @@ import org.quartz.JobDataMap;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TriggerInfo {
+public class TaskInfo {
     private String scheduleName;
     private String triggerName;
     private String triggerGroup;

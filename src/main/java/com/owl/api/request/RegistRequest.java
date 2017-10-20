@@ -1,7 +1,7 @@
 package com.owl.api.request;
 
 import com.owl.domain.HttpEntity;
-import com.owl.domain.TriggerInfo;
+import com.owl.domain.TaskInfo;
 import com.owl.utils.JsonUtil;
 
 import lombok.AllArgsConstructor;
@@ -20,15 +20,15 @@ import org.quartz.JobDataMap;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RegistRequest {
-  private TriggerInfo triggerInfo;
+  private TaskInfo taskInfo;
   private HttpEntity executeRequest;
   private HttpEntity callBack;
 
-  public TriggerInfo getTriggerInfo() {
+  public TaskInfo getTaskInfo() {
     JobDataMap jobDataMap = new JobDataMap();
     jobDataMap.put("request", JsonUtil.dumps(this.getExecuteRequest()));
     jobDataMap.put("callBack",JsonUtil.dumps(this.getCallBack()));
-    triggerInfo.setJobDataMap(jobDataMap);
-    return triggerInfo;
+    taskInfo.setJobDataMap(jobDataMap);
+    return taskInfo;
   }
 }

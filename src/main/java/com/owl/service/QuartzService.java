@@ -1,9 +1,8 @@
 package com.owl.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.owl.api.request.RegistRequest;
 import com.owl.domain.JobExecutor;
-import com.owl.domain.TriggerInfo;
+import com.owl.domain.TaskInfo;
 import com.owl.utils.TriggerUtil;
 
 import org.quartz.JobBuilder;
@@ -13,18 +12,16 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
+import org.quartz.impl.jdbcjobstore.TriggerStatus;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
-
 @Service
-public class QuartzService {
+public class QuartzService implements IQuartzService{
     private Scheduler scheduler;
     //系统唯一job
     private final JobKey jobKey = new JobKey("owl-job","owl-job");
@@ -34,35 +31,79 @@ public class QuartzService {
         this.scheduler = scheduler;
     }
 
-    /**
-     * 注册任务
-     * @param request 注册参数
-     * @throws SchedulerException
-     * @throws JsonProcessingException
-     */
-    public void addScheduler(RegistRequest request) throws SchedulerException, JsonProcessingException {
-        initob();
-        Trigger trigger = TriggerUtil.buildTrigger(request.getTriggerInfo());
+    @Override
+    public void addTask(RegistRequest request) throws SchedulerException{
+        initJob();
+        Trigger trigger = TriggerUtil.buildTrigger(request.getTaskInfo());
         trigger.getTriggerBuilder().forJob(jobKey);
         scheduler.scheduleJob(trigger);
     }
-
-    /**
-     * 获取任务列表
-     * @return 任务信息列表
-     * @throws SchedulerException
-     */
-    public List<TriggerInfo> listTask() throws SchedulerException {
+    @Override
+    public List<TaskInfo> listTasks() throws SchedulerException {
         List<? extends Trigger> triggers = scheduler.getTriggersOfJob(jobKey);
-        List<TriggerInfo> infoList = triggers.stream().map(TriggerUtil::triggerInfo).collect(Collectors.toList());
+        List<TaskInfo> infoList = triggers.stream().map(TriggerUtil::triggerInfo).collect(Collectors.toList());
         return infoList;
     }
+
+    @Override
+    public void removeTask(TriggerKey triggerKey) throws SchedulerException {
+        scheduler.unscheduleJob(triggerKey);
+    }
+
+    @Override
+    public void pauseTask(TriggerKey triggerKey) throws SchedulerException {
+        scheduler.pauseTrigger(triggerKey);
+    }
+
+    @Override
+    public void pauseTasks(List<TriggerKey> triggerKeys) throws SchedulerException {
+
+    }
+
+    @Override
+    public void pauseAll() throws SchedulerException {
+        scheduler.pauseTriggers(GroupMatcher.anyTriggerGroup());
+    }
+
+    @Override
+    public void resumeTask(TriggerKey triggerKey) throws SchedulerException {
+        scheduler.resumeTrigger(triggerKey);
+    }
+
+    @Override
+    public void resumeTasks(List<TriggerKey> triggerKeys) throws SchedulerException {
+
+    }
+
+    @Override
+    public void resumeAll() throws SchedulerException {
+        scheduler.resumeTriggers(GroupMatcher.anyTriggerGroup());
+    }
+
+    @Override
+    public TriggerStatus getTriggerState(TriggerKey triggerKey) throws SchedulerException {
+        Trigger trigger = scheduler.getTrigger(triggerKey);
+        TriggerStatus status = new TriggerStatus(scheduler.getTriggerState(triggerKey).toString(),trigger.getNextFireTime());
+        return status;
+    }
+
+    @Override
+    public void manualExecuteTask(TriggerKey triggerKey) throws SchedulerException {
+        scheduler.triggerJob(jobKey,scheduler.getTrigger(triggerKey).getJobDataMap());
+    }
+
+    @Override
+    public void updateTask(RegistRequest request,TriggerKey triggerKey) throws SchedulerException {
+        scheduler.unscheduleJob(triggerKey);
+        addTask(request);
+    }
+
 
     /**
      * 初始化job,注册新任务前调用
      * @throws SchedulerException
      */
-    public void initob() throws SchedulerException {
+    public void initJob() throws SchedulerException {
         //若调度器无job则添加job
         if (!scheduler.checkExists(jobKey)){
             JobDetail job = JobBuilder.newJob().ofType(JobExecutor.class)
@@ -73,5 +114,4 @@ public class QuartzService {
             scheduler.addJob(job,true);
         }
     }
-
 }

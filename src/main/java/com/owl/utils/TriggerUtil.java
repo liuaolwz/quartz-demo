@@ -4,7 +4,7 @@ import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.owl.domain.TriggerInfo;
+import com.owl.domain.TaskInfo;
 
 import org.quartz.Trigger;
 import org.springframework.beans.BeanUtils;
@@ -14,18 +14,18 @@ import org.springframework.beans.BeanUtils;
  */
 public class TriggerUtil {
 
-  public static TriggerInfo triggerInfo(Trigger trigger){
-    TriggerInfo triggerInfo = new TriggerInfo();
-    BeanUtils.copyProperties(triggerInfo,trigger);
-    return triggerInfo;
+  public static TaskInfo triggerInfo(Trigger trigger){
+    TaskInfo taskInfo = new TaskInfo();
+    BeanUtils.copyProperties(taskInfo,trigger);
+    return taskInfo;
   }
 
-  public static Trigger buildTrigger(TriggerInfo triggerInfo) throws JsonProcessingException {
-    Trigger trigger = newTrigger().withIdentity(triggerInfo.getTriggerName(),triggerInfo.getTriggerGroup())
-        .startAt(triggerInfo.getStartTime().toDate()).endAt(triggerInfo.getEndTime().toDate())
-        .withDescription(triggerInfo.getDescription()).withPriority(triggerInfo.getPriority())
+  public static Trigger buildTrigger(TaskInfo taskInfo){
+    Trigger trigger = newTrigger().withIdentity(taskInfo.getTriggerName(), taskInfo.getTriggerGroup())
+        .startAt(taskInfo.getStartTime().toDate()).endAt(taskInfo.getEndTime().toDate())
+        .withDescription(taskInfo.getDescription()).withPriority(taskInfo.getPriority())
         .withSchedule(simpleSchedule().withRepeatCount(10).withIntervalInSeconds(15))
-        .usingJobData(triggerInfo.getJobDataMap())
+        .usingJobData(taskInfo.getJobDataMap())
         .build();
     return trigger;
   }
