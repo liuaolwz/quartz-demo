@@ -2,7 +2,10 @@ package com.owl.config;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -30,11 +33,19 @@ public class QuartzConfig {
   }
 
   @Bean
-  public SchedulerFactoryBean schedulerFactoryBean(DataSource dataSource, PlatformTransactionManager transactionManager,
+  @ConfigurationProperties(prefix = "spring.datasource")
+  public DataSource quartzDatasource(){
+    return DataSourceBuilder.create().build();
+  }
+
+  @Bean
+  public SchedulerFactoryBean schedulerFactoryBean(
+      PlatformTransactionManager
+      transactionManager,
       AutowiringSpringBeanJobFactory autowiringSpringBeanJobFactory) {
     SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();
 
-    schedulerFactoryBean.setDataSource(dataSource);
+    schedulerFactoryBean.setDataSource(quartzDatasource());
     schedulerFactoryBean.setTransactionManager(transactionManager);
     schedulerFactoryBean.setOverwriteExistingJobs(true);
     schedulerFactoryBean.setWaitForJobsToCompleteOnShutdown(false);

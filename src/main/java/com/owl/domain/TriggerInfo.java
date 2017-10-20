@@ -27,7 +27,7 @@ public class TriggerInfo {
     private Integer priority;
     private String triggerState;
     private String triggerType;
-    private DateTime startTime = DateTime.now();
+    private DateTime startTime;
     private DateTime endTime;
     private String calenderName;
     private String misFireInstr;
