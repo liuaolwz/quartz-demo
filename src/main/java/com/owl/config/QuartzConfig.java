@@ -41,8 +41,7 @@ public class QuartzConfig {
   @Bean
   public SchedulerFactoryBean schedulerFactoryBean(
       PlatformTransactionManager
-      transactionManager,
-      AutowiringSpringBeanJobFactory autowiringSpringBeanJobFactory) {
+      transactionManager) {
     SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();
 
     schedulerFactoryBean.setDataSource(quartzDatasource());
@@ -51,7 +50,6 @@ public class QuartzConfig {
     schedulerFactoryBean.setWaitForJobsToCompleteOnShutdown(false);
     schedulerFactoryBean.setSchedulerName("etongdai-quartz");
     schedulerFactoryBean.setAutoStartup(true);
-    schedulerFactoryBean.setJobFactory(autowiringSpringBeanJobFactory);
 
     schedulerFactoryBean.setQuartzProperties(quartzProperties());
 

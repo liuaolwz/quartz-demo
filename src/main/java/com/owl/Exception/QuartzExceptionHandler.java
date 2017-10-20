@@ -17,6 +17,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class QuartzExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(value = SchedulerException.class)
   protected ResponseEntity<Object> handleScheduleException(SchedulerException e){
+    e.printStackTrace();
     return new ResponseEntity<Object>(e.getMessage(), HttpStatus.BAD_GATEWAY);
   }
 }

@@ -39,16 +39,10 @@ public class QuartzApi {
     }
     @ApiOperation(value = "注册新任务")
     @PostMapping(value = "/job")
-    public ResponseEntity regist(@RequestBody final RegistRequest request){
-        try {
-            quartzService.addTask(request);
-            log.info("添加任务成功");
-            return new ResponseEntity(HttpStatus.CREATED);
-        } catch (Exception e) {
-            log.info("添加任务失败");
-            e.printStackTrace();
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity regist(@RequestBody final RegistRequest request) throws SchedulerException {
+        quartzService.addTask(request);
+        log.info("添加任务成功");
+        return new ResponseEntity(HttpStatus.CREATED);
     }
     @ApiOperation(value = "定时任务列表")
     @GetMapping(value = "/job")

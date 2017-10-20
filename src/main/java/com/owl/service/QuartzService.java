@@ -34,8 +34,7 @@ public class QuartzService implements IQuartzService{
     @Override
     public void addTask(RegistRequest request) throws SchedulerException{
         initJob();
-        Trigger trigger = TriggerUtil.buildTrigger(request.getTaskInfo());
-        trigger.getTriggerBuilder().forJob(jobKey);
+        Trigger trigger = TriggerUtil.buildTrigger(request.getTaskInfo(),jobKey);
         scheduler.scheduleJob(trigger);
     }
     @Override
